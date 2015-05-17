@@ -1,0 +1,15 @@
+
+Related blog post: http://blog.cppse.local/nagios4-nagvis-nagiosgraph-docker
+
+
+    docker build -t rayburgemeestre/nagiosnagvis .
+    
+    docker run -P -t -i rayburgemeestre/nagiosnagvis
+    docker run -P -t -i -v /projects/nagiosnagvis/rrd-data:/usr/local/nagiosgraph/var/rrd rayburgemeestre/nagiosnagvis
+    docker run -P -t -i --entrypoint /bin/bash rayburgemeestre/nagiosnagvis
+
+
+Note-to-self:
+
+    docker push rayburgemeestre/nagiosnagvis
+
