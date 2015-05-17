@@ -115,7 +115,7 @@ RUN ./install.pl --check-prereq && \
     echo '   command_line  /usr/local/nagiosgraph/bin/insert.pl' >> /usr/local/nagios/etc/objects/commands.cfg && \
     echo '}'                                                     >> /usr/local/nagios/etc/objects/commands.cfg
 
-RUN echo "" \
+RUN \
     ### create a user-friendly index.html for default vhost \
     echo '<a href="/nagios/">nagios (l: nagiosadmin, p:admin)</a> <br/>'  > /var/www/html/index.html &&\
     echo '<a href="/nagvis/">nagvis (l: admin, p:admin)</a> <br/>'       >> /var/www/html/index.html &&\
