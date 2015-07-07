@@ -2,6 +2,8 @@ FROM ubuntu:14.04
 
 MAINTAINER Ray Burgemeestre
 
+# V1
+
 ENV nagvis nagvis-1.8.3
 ENV nagios nagios-4.0.8
 ENV nagiosplugins nagios-plugins-2.0.3
@@ -116,14 +118,33 @@ RUN ./install.pl --check-prereq && \
     echo '}'                                                     >> /usr/local/nagios/etc/objects/commands.cfg
 
 RUN \
-    ### create a user-friendly index.html for default vhost \
-    echo '<a href="/nagios/">nagios (l: nagiosadmin, p:admin)</a> <br/>'  > /var/www/html/index.html &&\
-    echo '<a href="/nagvis/">nagvis (l: admin, p:admin)</a> <br/>'       >> /var/www/html/index.html &&\
-    echo '<a href="/nagiosgraph/cgi-bin/show.cgi">nagiosgraph</a> <br/>' >> /var/www/html/index.html &&\
-    \
     ### create a script that starts both apache and the nagios process \
+    ### TODO: replace this with something better \
     echo "/usr/sbin/apache2ctl start"                                     > /usr/bin/start-apache-and-nagios.sh &&\
     echo "/usr/local/nagios/bin/nagios /usr/local/nagios/etc/nagios.cfg" >> /usr/bin/start-apache-and-nagios.sh
+
+# V2
+
+ADD provisioning/nagios-ssh                         /home/nagios/.ssh
+ADD provisioning/system-scripts/slack_notification  /usr/bin/slack_notification
+ADD provisioning/system-scripts/slack_nagios.pl     /usr/bin/slack_nagios.pl
+ADD provisioning/nagios-config                      /usr/local/nagios/etc
+ADD provisioning/nagvis-config                      /usr/local/nagvis/etc
+ADD provisioning/nagios-plugins                     /usr/local/nagios/libexec-custom
+ADD provisioning/index.php                          /var/www/html/index.php
+
+RUN rm -rf /usr/local/nagios/etc/resource.cfg && \
+    ln -s /etc/sensitive-data/resource.cfg /usr/local/nagios/etc/resource.cfg && \
+    ln -s /etc/sensitive-data/nagios.id_rsa /home/nagios/.ssh/nagios.id_rsa && \
+    apt-get install -y screen ksh redis-tools libredis-perl && \
+    chown -h nagios.nagios /home/nagios/.ssh/* && \
+    (chmod 700 /home/nagios/.ssh/* || true) && \
+    chmod +x /usr/bin/slack_* && \
+    # set correct permissions inside nagios configuration dir \
+    chmod 775 /usr/local/nagios/etc -R && \
+    chown nagios.nagios /usr/local/nagios/etc -R
+
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 EXPOSE 80
 
