@@ -30,10 +30,10 @@ fi
 echo "attempting to launch rayburgemeestre/nagiosnagvis at: http://$host:7000/"
 
 # nagios(1000) staff(50)
-chown 1000:50 ${dir}/sensitive-data -R
-chmod     755 ${dir}/sensitive-data -R
-chown 1000:50 ${dir}/rrd-data -R
-chmod     755 ${dir}/rrd-data -R
+sudo chown -R 1000:50 ${dir}/sensitive-data
+sudo chmod -R     755 ${dir}/sensitive-data
+sudo chown -R 1000:50 ${dir}/rrd-data
+sudo chmod -R     755 ${dir}/rrd-data
 
 if [[ $script = *dev* ]]; then
     docker run $* -p 7000:80 -t -i \
